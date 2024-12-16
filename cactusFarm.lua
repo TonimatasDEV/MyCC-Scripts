@@ -92,6 +92,7 @@ function doCactusFarm()
 end
 
 for i = 1, rows do -- Rows
+    turtle.select(1)
     turtle.refuel(64)
     turtle.forward()
 
