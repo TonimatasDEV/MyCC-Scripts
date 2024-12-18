@@ -1,6 +1,8 @@
 columns = 38
 rows = 24
 finishedRows = 0
+floors = 50
+finishedFloors = 5 -- Starting floor
 
 function returnChest()
     turtle.turnLeft()
@@ -11,44 +13,46 @@ function returnChest()
 
     turtle.turnLeft()
 
-    for i = 1, columns * 2 + 1 do
+    for i = 1, columns * 2 + 2 do
         turtle.forward()
     end
 
-    turtle.turnLeft()
-    turtle.forward()
-    turtle.forward()
+    for i = 1, finishedFloors * 4 + 5 do
+        turtle.down()
+    end
 end
 
 function refillMaterials()
-    turtle.turnRight()
-    turtle.forward()
-    turtle.turnRight()
-    turtle.forward()
-    turtle.forward()
-    turtle.turnRight()
-    turtle.turnRight()
-    
+    turtle.turnLeft()
+
     for i = 1, 5 do
         turtle.select(i)
         turtle.suckDown(64 - turtle.getItemCount(i))
-        
+
         if i ~= 5 then
             turtle.forward()
         end
     end
-    
+
     turtle.turnRight()
     turtle.turnRight()
     turtle.forward()
     turtle.forward()
-    turtle.turnRight()
     turtle.forward()
-    turtle.turnRight()
+    turtle.forward()
 end
 
 function prepareForNextRow()
-    for i = 1, finishedRows * 2 do
+    turtle.turnRight()
+
+    for i = 1, finishedFloors * 4 + 5 do
+        turtle.up()
+    end
+
+    turtle.forward()
+    turtle.turnRight()
+
+    for i = 1, finishedRows * 2 + 2 do
         turtle.forward()
     end
 
@@ -77,7 +81,7 @@ function doCactusFarm()
     turtle.forward()
     turtle.turnLeft()
     turtle.select(5) -- Fence
-    
+
     if placeFence then
         turtle.place()
         placeFence = false
@@ -91,17 +95,22 @@ function doCactusFarm()
     turtle.down()
 end
 
-for i = 1, rows do -- Rows
-    turtle.select(1)
-    turtle.refuel(64)
-    turtle.forward()
+for i = finishedFloors, floors do
+    for k = 1, rows do -- Rows
+        prepareForNextRow()
+        turtle.select(1)
+        turtle.refuel(64)
+        turtle.forward()
 
-    for i = 1, columns do -- Columns
-        doCactusFarm()
+        for j = 1, columns do -- Columns
+            doCactusFarm()
+        end
+
+        finishedRows = finishedRows + 1
+        returnChest()
+        refillMaterials()
     end
-    
-    finishedRows = finishedRows + 1
-    returnChest()
-    refillMaterials()
-    prepareForNextRow()
+
+    finishedFloors = finishedFloors + 1
+    finishedRows = 0
 end
