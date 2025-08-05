@@ -1,3 +1,11 @@
+local forwardTimes = 9
+local rotateTimes = 9
+local replant = true
+local maxAge = 7
+local block = "minecraft:potatoes"
+local hasSeed = false
+local seed = "seed"
+
 while true do
     if not redstone.getInput("left") then
         sleep(0.5)
@@ -17,15 +25,35 @@ while true do
     turtle.up()
     turtle.forward()
 
+    function selectSeedItem()
+        for i = 1, 16 do
+            turtle.select(i)
+            local item = turtle.getItemDetail()
+            
+            if item then
+                if item.name == seed then
+                    break
+                end
+            end
+        end
+    end
+
     function recolect()
         local success, data = turtle.inspectDown()
 
         if success then
-            if data.name == "minecraft:potatoes" then
+            if data.name == block then
                 local age = tonumber(data.state.age)
-                if age == 7 then
+                if age == maxAge then
                     turtle.digDown()
-                    turtle.placeDown()
+                    
+                    if replant then
+                        if hasSeed then
+                            selectSeedItem()
+                        end
+
+                        turtle.placeDown()
+                    end
                 end
             end
         end
@@ -33,8 +61,8 @@ while true do
 
     local forward = true
 
-    for i = 1, 9 do
-        for i = 1, 8, 1 do
+    for i = 1, rotateTimes do
+        for i = 1, forwardTimes - 1 do
             recolect()
             turtle.forward()
         end
@@ -54,14 +82,14 @@ while true do
         end
     end
 
-    for i = 1, 9 do
+    for i = 1, forwardTimes do
         turtle.forward()
     end
 
     turtle.turnLeft()
 
 
-    for i = 1, 9 do
+    for i = 1, rotateTimes do
         turtle.forward()
     end
 
