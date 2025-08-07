@@ -6,15 +6,76 @@ local block = "minecraft:potatoes"
 local hasSeed = false
 local seed = "seed"
 
+
+function isEmpty()
+    for i = 1, 16 do
+        turtle.select(i)
+        local item = turtle.getItemDetail()
+
+        if item then
+            return false
+        end
+    end
+
+    return true
+end
+
+function selectSeedItem()
+    for i = 1, 16 do
+        turtle.select(i)
+        local item = turtle.getItemDetail()
+
+        if item then
+            if item.name == seed then
+                break
+            end
+        end
+    end
+end
+
+function recolect()
+    local success, data = turtle.inspectDown()
+
+    if success then
+        if data.name == block then
+            local age = tonumber(data.state.age)
+            if age == maxAge then
+                turtle.digDown()
+
+                if replant then
+                    if hasSeed then
+                        selectSeedItem()
+                    end
+
+                    turtle.placeDown()
+                end
+            end
+        end
+    end
+end
+
 while true do
-    if not redstone.getInput("left") then
-        sleep(0.5)
+    local success, data = turtle.inspect()
+
+    if success then
+        if data.name == block then
+            local age = tonumber(data.state.age)
+
+            if age < maxAge or not isEmpty() then
+                sleep(30)
+                goto continue
+            end
+        end
+    else
         goto continue
     end
 
     if turtle.getFuelLevel() < 1000 then
         if turtle.suckDown() then
             turtle.refuel()
+        else
+            sleep(10)
+            goto continue
         end
 
         turtle.turnLeft()
@@ -24,40 +85,6 @@ while true do
 
     turtle.up()
     turtle.forward()
-
-    function selectSeedItem()
-        for i = 1, 16 do
-            turtle.select(i)
-            local item = turtle.getItemDetail()
-            
-            if item then
-                if item.name == seed then
-                    break
-                end
-            end
-        end
-    end
-
-    function recolect()
-        local success, data = turtle.inspectDown()
-
-        if success then
-            if data.name == block then
-                local age = tonumber(data.state.age)
-                if age == maxAge then
-                    turtle.digDown()
-                    
-                    if replant then
-                        if hasSeed then
-                            selectSeedItem()
-                        end
-
-                        turtle.placeDown()
-                    end
-                end
-            end
-        end
-    end
 
     local forward = true
 
