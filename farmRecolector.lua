@@ -13,10 +13,12 @@ function isEmpty()
         local item = turtle.getItemDetail()
 
         if item then
+            turtle.select(1)
             return false
         end
     end
 
+    turtle.select(1)
     return true
 end
 
